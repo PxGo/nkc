@@ -1,6 +1,10 @@
+import {clearUsername, clearUserBanner, clearUserDescription, clearUserAvatar} from "../lib/js/user";
+
 window.SubscribeTypes = undefined;
 var initComplexOptions = !!localStorage.getItem("search_complexOptions");
 const data = NKC.methods.getDataById('data');
+import {sweetQuestion} from "../lib/js/sweetAlert";
+
 var app = new Vue({
   el: "#app",
   data: {
@@ -196,8 +200,26 @@ function showResource(lid) {
   ResourceInfo.open({lid: lid})
 }
 
+function bandUser(uid, banned) {
+  return Promise.resolve()
+    .then(() => {
+      if(banned) {
+        return sweetQuestion(`确定要执行当前操作吗？`)
+      }
+    })
+    .then(() => {
+      return bannedUser(uid, banned);
+    })
+    .catch(sweetError)
+}
+
 Object.assign(window, {
   initComplexOptions,
   app,
   showResource,
+  bandUser,
+  clearUsername,
+  clearUserDescription,
+  clearUserAvatar,
+  clearUserBanner,
 });

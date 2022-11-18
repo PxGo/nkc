@@ -945,9 +945,14 @@ userSchema.methods.getNewMessagesCount = async function() {
   let newApplicationsCount = 0;
   let newReminderCount = 0;
   if(systemInfo) {
-    const allMySystemInfoMessageCount = (await MessageModel.getMySystemInfoMessage(this.uid)).length;
-    // const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
-    const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
+    const mySystemInfoMessagesId = await MessageModel.getUserSystemInfoMessagesId(this.uid);
+    const allMySystemInfoMessageCount = mySystemInfoMessagesId.length;
+    const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({
+      uid: this.uid,
+      mid: {
+        $in: mySystemInfoMessagesId
+      },
+    });
     newSystemInfoCount = allMySystemInfoMessageCount - viewedSystemInfoCount;
     // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
     if(newSystemInfoCount < 0) {
@@ -1124,6 +1129,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
         avatar: column.avatar,
         abbr: column.abbr,
         subCount: column.subCount,
+        closed: column.closed,
       }
     }
     for(const cert of certs) {
@@ -1708,6 +1714,7 @@ userSchema.statics.getUserColumn = async (uid) => {
 * @author pengxiguaa 2019-8-16
 * */
 userSchema.statics.checkUsername = async (username = "") => {
+  const UserModel = mongoose.model('users');
   const {contentLength} = require("../tools/checkString");
   const length = contentLength(username);
   if (!length) throwErr(400, "用户名不能为空");
@@ -1717,6 +1724,7 @@ userSchema.statics.checkUsername = async (username = "") => {
   reg = /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/;
   if (!reg.test(username))
     throwErr(400, "用户名只能由汉字、英文、阿拉伯数字和下划线组成，且不能以下划线开始");
+  await UserModel.checkUsernameSensitiveWords(username);
 };
 /*
 * 判断用户是否有足够的科创币修改用户名
@@ -1937,7 +1945,7 @@ userSchema.statics.checkStatusForDestroyAccount = async (uid) => {
   const user = await UserModel.findOnly({uid});
   // 拓展用户信息 判断账号下是否有正常开发的专栏
   await UserModel.extendUserInfo(user);
-  if(user.column) status.column = false;
+  if(user.column && !user.column.closed) status.column = false;
   // 判断用户出售的商品是否均停售，订单是否都已完成
   const productCount = await ShopGoodsModel.countDocuments({uid, productStatus: "insale"});
   if(productCount > 0) status.shopSeller = false;
@@ -2388,6 +2396,7 @@ userSchema.statics.checkNewUsername = async (username) => {
   const UserModel = mongoose.model('users');
   const ColumnModel = mongoose.model('columns');
   const SecretBehaviorModel = mongoose.model('secretBehaviors');
+  await UserModel.checkUsernameSensitiveWords(username);
   await UserModel.checkUsername(username);
   username = username.toLowerCase();
   let sameNameUser = await UserModel.findOne({usernameLowerCase: username});
@@ -2776,6 +2785,22 @@ userSchema.statics.getUsersObjectByUsersId = async (usersId) => {
   return usersObj;
 }
 
+userSchema.statics.getUsersBaseObjectByUsersId = async (usersId) => {
+  const {getUrl} = require('../nkcModules/tools');
+  const UserModel = mongoose.model('users');
+  const users = await UserModel.find({uid: {$in: usersId}}, {uid: 1, avatar: 1, username: 1});
+  const usersObj = {};
+  for(let i = 0; i < users.length; i++) {
+    const {uid, avatar, username} = users[i];
+    usersObj[uid] = {
+      uid,
+      avatar: tools.getUrl('userAvatar', avatar),
+      username,
+    };
+  }
+  return usersObj;
+}
+
 userSchema.statics.getImproveUserInfoByMiddlewareUser = async function(user) {
   if(!user) return null;
   const UsersPersonalModel = mongoose.model("usersPersonal");
@@ -2806,6 +2831,93 @@ userSchema.statics.getImproveUserInfoByMiddlewareUser = async function(user) {
     verifyPhoneNumber: !needVerifyPhoneNumber,
   };
 }
+
+userSchema.statics.checkAccessControlPermissionWithThrowError = async props => {
+  const AccessControlModel = mongoose.model('accessControl');
+  const sources = await AccessControlModel.getSources();
+  const {
+    uid,
+    rolesId,
+    gradeId,
+    isApp
+  } = props;
+  await AccessControlModel.checkAccessControlPermissionWithThrowError({
+    uid,
+    rolesId,
+    gradeId,
+    isApp,
+    source: sources.user,
+  });
+}
+
+/*
+* 获取账号注册信息
+* @param {{
+*    uid: string
+*    ipId: string
+*    ip: string
+* }} props
+* @return {{
+*   addr: string ip归属地
+*   authType: string 认证方式
+*   field: string 领域信息
+*   subject: string 主体类型
+* }}
+* */
+userSchema.statics.getAccountRegisterInfo = async (props) => {
+  const {uid, ipId, ip} = props;
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const IPModel = mongoose.model('ips');
+  const up =  await UsersPersonalModel.findOne({uid}, {email: 1, uid: 1, regIP: 1});
+  const authLevel = await up.getAuthLevel();
+  let authType = '未同步';
+  if([2, 3].includes(authLevel)) {
+    authType = '身份证号';
+  } else if(authLevel === 1) {
+    authType = '手机号';
+  } else if(up.email) {
+    authType = '邮箱';
+  }
+  let targetIp = up.regIP;
+  if(!targetIp) {
+    if(ipId) {
+      targetIp = await IPModel.getIpByIpId(ipId);
+    } else if(ip) {
+      targetIp = ip;
+    }
+  }
+  const addr = await IPModel.getIpAddr(targetIp);
+  return {
+    addr,
+    authType,
+    field: '无',
+    subject: '个人'
+  };
+}
+
+userSchema.statics.checkUsernameSensitiveWords = async (text = '') => {
+  if(!text) return;
+  const SettingModel = mongoose.model('settings');
+  const usernameSettings = await SettingModel.getSettings('username');
+  const {words, usernameTip} = usernameSettings.sensitive;
+  for(const word of words) {
+    if(text.includes(word)) {
+      throwErr(400, usernameTip);
+    }
+  }
+};
+
+userSchema.statics.checkUserDescriptionSensitiveWords = async (text = '') => {
+  if(!text) return;
+  const SettingModel = mongoose.model('settings');
+  const usernameSettings = await SettingModel.getSettings('username');
+  const {words, descTip} = usernameSettings.sensitive;
+  for(const word of words) {
+    if(text.includes(word)) {
+      throwErr(400, descTip);
+    }
+  }
+};
 
 module.exports = mongoose.model('users', userSchema);
 

@@ -89,7 +89,7 @@ router
     if(!['modify', 'publish', 'create', 'save'].includes(type)) ctx.throw(400, `未知的提交类型 type: ${type}`);
     let comment;
     if(commentId) {
-      comment = await db.CommentModel.findOne({_id: commentId});
+      comment = await db.CommentModel.findOne({_id: commentId, uid: state.uid});
     }
     if(type === 'create' && !comment) {
       comment = await db.CommentModel.createComment({
@@ -126,7 +126,10 @@ router
           const order = await db.CommentModel.getCommentOrder(article._id);
           await comment.updateOrder(order);
           //发布评论
-          data.renderedComment = await comment.publishComment(article, toColumn);
+          data.renderedComment = await comment.publishComment(article, toColumn, {
+            ip: ctx.address,
+            port: ctx.port,
+          });
           //更新评论引用的评论数replies
           await db.ArticlePostModel.updateOrder(order, article._id);
           await lock.unlock();

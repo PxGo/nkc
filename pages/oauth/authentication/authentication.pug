@@ -1,0 +1,24 @@
+extends ../../bootstrap_base
+block title
+  title 第三方认证
+  +includeCSS('/oauth/authentication/authentication.css')
+block content
+  .hidden#data=objToStr({oauthInfo: data.oauthInfo})
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        .oauth-container
+          .oauth-title.m-b-1
+            span 应用「
+            a(:href="appHome" target="_blank") {{appName}}
+            span 」申请执行以下操作：
+          .oauth-operations.m-b-1
+            .oauth-operation(v-for='operation in operations') # {{operation.name}}
+          .oauth-options(v-if='logged')
+            button.btn.btn-primary.m-r-05(@click='submit()') 确认授权
+            button.btn.btn-default(@click='cancel()') 取消
+          .oauth-options(v-else)
+            button.btn.btn-primary.m-r-05(@click='toLogin()') 登录
+            button.btn.btn-default(@click='toLogin("register")') 注册
+block scripts
+  +includeJS('/oauth/authentication/authentication.js')

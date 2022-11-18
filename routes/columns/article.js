@@ -2,7 +2,6 @@ const router = require('koa-router')();
 
 router.get('/:aid', async (ctx, next)=>{
   const {db, data, nkcModules, params, query, state, permission} = ctx;
-  const {pageSettings, uid} = state;
   const {highlight, t, last_page, token} = query;
   let {page = 0} = query;
   ctx.template = 'columns/article.pug';
@@ -10,10 +9,12 @@ router.get('/:aid', async (ctx, next)=>{
   const {_id, aid} = params;
   data.highlight = highlight;
   let xsf = user ? user.xsf : 0;
-  
   let columnPostData = await db.ColumnPostModel.getDataRequiredForArticle(_id, aid, xsf);
   data.columnPost = columnPostData;
   data.columnPost.collected = false;
+  data.authorAccountRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+    uid: columnPostData.column.uid
+  });
   const {article, thread} = await db.ColumnPostModel.getColumnPostTypes();
   const homeSettings = await db.SettingModel.getSettings("home");
   let isModerator;
@@ -128,15 +129,16 @@ router.get('/:aid', async (ctx, next)=>{
     //文章浏览数加一
     await article.addArticleHits();
   } else if(columnPostData.type === thread) {
-    const permissions = {
+    data.permissions = {
       cancelXsf: ctx.permission('cancelXsf'),
       modifyKcbRecordReason: ctx.permission('modifyKcbRecordReason'),
     };
-    data.permissions = permissions;
     //获取论坛文章的评论
     const thread = await db.ThreadModel.findOnly({tid: columnPostData.thread.tid});
     //
     if(!thread) ctx.throw(400, '未找到文章，请刷新');
+    // 专业权限判断
+    await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     //判断用户是否具有专家权限
     isModerator = await db.ForumModel.isModerator(state.uid, thread.mainForumsId);
     //文章收藏数
@@ -184,7 +186,7 @@ router.get('/:aid', async (ctx, next)=>{
     //获取文章下的所有回复
     const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList)
     data.paging = paging;
-    let posts = await db.PostModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    let posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     const options = {
       uid: data.user?data.user.uid:'',
       visitor: data.user,
@@ -192,6 +194,20 @@ router.get('/:aid', async (ctx, next)=>{
     //拓展专栏的文章回复
     posts = await db.PostModel.extendPostsByColumn(posts, options);
     data.columnPost.posts  = posts;
+    // 文章的置顶回复
+    const toppedPostsId = thread.toppedPostsId;
+    const toppedPostMatch = {... match};
+    toppedPostMatch.pid = {$in: toppedPostsId};
+    const toppedPostsRandom = await db.PostModel.find(match);
+    let toppedPosts = [];
+    for(const post of toppedPostsRandom) {
+      const index = toppedPostsId.indexOf(post.pid);
+      if(index === -1) continue;
+      toppedPosts[index] = post;
+    }
+    toppedPosts = toppedPosts.filter(post => !!post);
+    toppedPosts = await db.PostModel.extendPostsByColumn(toppedPosts, options);
+    data.columnPost.toppedPosts = toppedPosts;
     // 文章访问量加1
     await thread.updateOne({$inc: {hits: 1}});
   } else {

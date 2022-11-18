@@ -129,7 +129,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
   let res = {};
   if(articleData.type === articleType){
     const {_id: columnPostId, thread, article, editorUrl, column, mainCategory, auxiliaryCategory, type} = articleData;
-    const {uid, origin, toc, title, abstract, abstractEN, keywordsEN, keywords, content, tlm, dt, authorInfos} = article.document;
+    const {uid, atUsers, origin, toc, title, abstract, abstractEN, keywordsEN, keywords, content, tlm, dt, authorInfos} = article.document;
     //获取文章评论数
     thread.count = article.count;
     res = {
@@ -154,12 +154,12 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
         abstractEn: abstractEN,
         keyWordsCn: keywords,
         keyWordsEn: keywordsEN,
-        c: await ColumnPostModel.getRenderHTML(content, article.documentResourceId, xsf),
+        c: await ColumnPostModel.getRenderHTML(content, article.documentResourceId, xsf, atUsers),
       }
     };
   } else if(articleData.type === threadType) {
     const {article, thread, _id, column, user, resources, mainCategory, auxiliaryCategory, type, url} = articleData;
-    const {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, authorInfos, dt} = article;
+    const {uid, atUsers, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, authorInfos, dt} = article;
     thread.url = url;
     res = {
       _id,
@@ -182,7 +182,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
         abstractEn,
         keyWordsCn,
         keyWordsEn,
-        c: await ColumnPostModel.getRenderHTML(c, resources, xsf),
+        c: await ColumnPostModel.getRenderHTML(c, resources, xsf, atUsers),
       }
     };
   } else {
@@ -194,7 +194,7 @@ schema.statics.getDataRequiredForArticle = async (columnId, _id, xsf) => {
 /*
 * 获取渲染的富文本
 * */
-schema.statics.getRenderHTML = async function(content, documentResourceId, xsf) {
+schema.statics.getRenderHTML = async function(content, documentResourceId, xsf, atUsers = []) {
   const nkcRender = require('../nkcModules/nkcRender');
   const ResourceModel = mongoose.model('resources');
   let resources;
@@ -206,7 +206,8 @@ schema.statics.getRenderHTML = async function(content, documentResourceId, xsf) 
   return nkcRender.renderHTML({
     post: {
       c: content,
-      resources
+      resources,
+      atUsers
     },
     user:{xsf},
   })
@@ -573,38 +574,35 @@ schema.statics.checkColumnPost = async (columnId, pid) => {
 * @param {Number} count 条数
 * */
 schema.statics.getLatestThreads = async (columnId, count = 3, fids) => {
+  const {getUrl} = require('../nkcModules/tools');
   const ColumnPostModel = mongoose.model('columnPosts');
-  const PostModel = mongoose.model('posts');
-  const columnPosts = await ColumnPostModel.find({
+  let columnPosts = await ColumnPostModel.find({
     hidden: false,
     columnId,
-    type: 'thread'
-  }, {
-    pid: 1
+    type: {
+      $in: ['thread', 'article']
+    }
   })
     .sort({toc: -1})
     .limit(count);
-  const postsId = columnPosts.map(cp => cp.pid);
-  const posts = await PostModel.find({
-    pid: {
-      $in: postsId
-    },
-    type: 'thread',
-    mainForumsId: {$in: fids}
-  }, {
-    t: 1,
-    pid: 1,
-    tid: 1,
+  columnPosts = await ColumnPostModel.extendColumnPosts({
+    columnPosts: columnPosts,
+    fidOfCanGetThread: fids,
+    isModerator: false
   });
-  const postsObj = {};
-  for(const post of posts) {
-    postsObj[post.pid] = post;
-  }
   const results = [];
-  for(const pid of postsId) {
-    const post = postsObj[pid];
-    if(!post) continue;
-    results.push(post);
+  for(const cp of columnPosts) {
+    const url = getUrl('columnThread', cp.columnId, cp._id);
+    let title;
+    if(cp.type === 'thread') {
+      title = cp.post.t;
+    } else {
+      title = cp.article.document.title;
+    }
+    results.push({
+      title,
+      url
+    });
   }
   return results;
 };
@@ -625,7 +623,7 @@ schema.statics.createColumnPost = async function(article, selectCategory) {
     sid = selectCategory.selectedMinorCategoriess[0].columnId;
   }
   if(!sid) {
-    throw(500, '未找到分享的专栏');
+    throwErr(500, '未找到分享的专栏');
   }
   //如果article存在sid,通过sid查找专栏
   const column = await ColumnModel.findOnly({_id: sid});

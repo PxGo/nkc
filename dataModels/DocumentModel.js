@@ -14,7 +14,6 @@ const documentStatus = {
   normal: "normal",// 正常状态 能被所有用户查看的文档
   faulty: "faulty", // 退修
   cancelled: 'cancelled', // 取消发布
-  unknown: "unknown"// 需要审核
 };
 
 const documentTypes = {
@@ -192,7 +191,12 @@ const schema = new mongoose.Schema({
   // IP 所对应的端口
   port: {
     type: String,
-    default: ''
+    default: '',
+  },
+  // 归属地
+  addr: {
+    type: String,
+    default: '',
   }
   // 已发送过@通知的用户
 }, {
@@ -314,6 +318,8 @@ schema.statics.createBetaDocument = async (props) => {
   const wordCount = getHTMLTextLength(content);
   const _id = await DocumentModel.getId();
   const did = await DocumentModel.getDid();
+  const ipId = await IPModel.saveIPAndGetToken(ip);
+  const addr = await IPModel.getIpAddr(ip);
   const document = await DocumentModel({
     _id,
     did,
@@ -333,8 +339,9 @@ schema.statics.createBetaDocument = async (props) => {
     type: (await DocumentModel.getDocumentTypes()).beta,
     source,
     sid,
-    ip: await IPModel.saveIPAndGetToken(ip),
-    port
+    ip: ipId,
+    port,
+    addr,
   });
   await document.save();
   await document.updateResourceReferences();
@@ -958,10 +965,16 @@ schema.methods.getAtUsers = async function() {
 schema.methods.sendMessageToAtUsers = async function(from) {
   if(!['post', 'article'].includes(from)) throwErr(500, `document from error`);
   const socket = require('../nkcModules/socket');
-  const DocumentModel = mongoose.model('documents');
   const MessageModel = mongoose.model('messages');
   const SettingModel = mongoose.model('settings');
   const {atUsers: oldAtUsers, source} = this;
+  if(
+    ![
+      documentSources.moment,
+      documentSources.article,
+      documentSources.comment,
+    ].includes(source)
+  ) return;
   const atUsers = await this.getAtUsers();
   const oldAtUsersId = oldAtUsers.map(u => u.uid);
   const newAtUsers = oldAtUsers;
@@ -1577,4 +1590,36 @@ schema.statics.disabledToDraftDocuments = async function() {
   }
 }
 
+/*
+* 替换内容中的at为用户主页链接
+* */
+schema.methods.renderAtUsers = async function() {
+  const DocumentModel = mongoose.model('documents');
+  return await DocumentModel.renderAtUsers(this.content, this.atUsers);
+}
+
+schema.statics.renderAtUsers = async (content, atUsers) => {
+  const {getUrl} = require('../nkcModules/tools');
+  const usersObj = {};
+  const names = [];
+  for(const au of atUsers) {
+    const {username, uid} = au;
+    usersObj[username] = uid;
+    const usernameLC = username.toLowerCase();
+    usersObj[usernameLC] = uid;
+    names.push(username, usernameLC);
+  }
+  return content.replace(new RegExp(`@(${names.join('|')})`, 'ig'), (c, v) => {
+    let newContent = c;
+    const uid = usersObj[v];
+    if(uid) {
+      const element = cheerio.load(`<a target="_blank"></a>`);
+      element('a')
+        .attr('href', getUrl('userHome', uid))
+        .text(`@${v}`);
+      newContent = element('body').html();
+    }
+    return newContent;
+  });
+}
 module.exports = mongoose.model('documents', schema);

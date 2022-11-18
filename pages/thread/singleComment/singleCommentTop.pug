@@ -2,7 +2,7 @@ if !isIncluded('singleCommentTop')
   include ../../publicModules/mixin
   include ../singlePost/singlePostVote
   mixin singleCommentTop(props)
-    -var {uid, username, avatar, banned, digest} = props;
+    -var {uid, username, avatar, banned, digest, addr} = props;
     -var {voteUp, vote, pid, toc, tlm, parentUser} = props;
     .single-comment-top
       img.single-comment-avatar(src=avatar class=banned? 'user-banned-avatar':'')
@@ -33,6 +33,7 @@ if !isIncluded('singleCommentTop')
           if tlm
             | &nbsp;修改于&nbsp;
             +fromNow(tlm)
+          span=` IP:${addr}`
       .single-comment-options
         +singlePostVote(pid, vote, voteUp)
         .single-post-bottom-item.icon-item(
@@ -41,5 +42,5 @@ if !isIncluded('singleCommentTop')
           title='分享'
           )
           .fa.fa-share-square-o.share-icon.option-icon
-        .single-post-bottom-item.icon-item(data-type='postOption' data-pid=pid title='其他操作')
+        .single-post-bottom-item.icon-item(data-type='postOption' data-pid=pid title='其他操作' data-direction='down')
           .fa.fa-sliders.option-icon.option-icon

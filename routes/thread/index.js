@@ -17,6 +17,16 @@ function isIncludes(arr, id, type) {
 }
 
 threadRouter
+  .use('/', async (ctx, next) => {
+    const {db, state, data} = ctx;
+    await db.ForumModel.checkAccessControlPermissionWithThrowError({
+      uid: state.uid,
+      rolesId: data.userRoles.map(r => r._id),
+      gradeId: state.uid? data.userGrade._id: undefined,
+      isApp: state.isApp,
+    });
+    await next();
+  })
 	.get('/', async (ctx, next) => {
 		const {data, db, query, nkcModules} = ctx;
 		const {user} = data;
@@ -216,6 +226,7 @@ threadRouter
 
     const tid = thread.tid;
 
+
     // 拓展文章属性
     await thread.extendThreadCategories();
     const authorId = thread.uid;
@@ -283,6 +294,12 @@ threadRouter
 
     // 加载文章内容POST
     let firstPost = await db.PostModel.findOnly({pid: thread.oc});
+
+    const authorRegisterInfo = await db.UserModel.getAccountRegisterInfo({
+      uid: thread.uid,
+      ipId: firstPost.ipoc,
+    });
+
     firstPost = await db.PostModel.extendPost(firstPost, extendPostOptions);
     const _firstPost = (await db.PostModel.filterPostsInfo([firstPost]))[0];
     const firstPostCredit = {
@@ -822,6 +839,7 @@ threadRouter
     data.threadSettings = threadSettings;
     data.postPermission = postPermission;
     data.authorAvatarUrl = authorAvatarUrl;
+    data.authorRegisterInfo = authorRegisterInfo;
 
     // 商品信息
     if(threadShopInfo) {
@@ -1642,6 +1660,8 @@ threadRouter
       // 生成动态
       const momentQuoteTypes = await db.MomentModel.getMomentQuoteTypes();
       db.MomentModel.createQuoteMomentAndPublish({
+        ip: ctx.address,
+        port: ctx.port,
         uid: _post.uid,
         quoteType: momentQuoteTypes.post,
         quoteId: _post.pid,

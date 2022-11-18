@@ -3,7 +3,7 @@ block baseColumnTitle
     title=`${data.columnPost.post.t}`
     +includeCSS('/columns/article/article.css')
 block baseColumnContent
-  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, collected} = data.columnPost
+  -var {post, column, mainCategory, auxiliaryCategory, thread, collectedCount, userAvatar, type, article, user, posts, toppedPosts, collected} = data.columnPost
   -var {_id, name} = column
   -var {hits, count, oc, url} = thread
   -var {uid, originState, toc, t, abstractCn, abstractEn, keyWordsCn, keyWordsEn, c, tlm, dt, authorInfos} = post
@@ -76,6 +76,18 @@ block baseColumnContent
           else if !thread.reviewed
             .thread-review-info 文章未审核
         +thread
+  if type !== 'article' && toppedPosts && toppedPosts.length > 0
+    .article-common.m-b-1
+      include ../thread/singlePost/singlePost
+      .m-b-1
+        .panel-header
+          .fa.fa-thumb-tack &nbsp;
+          | 置顶回复
+        div
+          for post in toppedPosts
+            +singlePost(Object.assign({}, post, {hidePostBottom: true}))
+
+
   .article-common.m-b-1(style="position: relative")#comment-content
     div
       if type === 'article'
@@ -87,8 +99,11 @@ block baseColumnContent
             if !posts || posts.length === 0
               span 空空如也
             else
+              include ../publicModules/paging/paging
               for post in posts
                 +singlePost(Object.assign(post, {hidePostBottom: true}))
+              .m-t-05
+                include ../publicModules/paging/paging_input
           div
             a.btn.btn-default(href=url + '#container') 去评论
     //- .col-xs-12.col-md-3.box-shadow-panel#rightDom
