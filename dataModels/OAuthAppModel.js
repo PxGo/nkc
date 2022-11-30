@@ -40,12 +40,12 @@ const schema = mongoose.Schema({
   },
   status: {
     type: String,
-    default: appStatus.unknown,
+    default: appStatus.normal,
     index: 1
   },
   operations: {
     type: [String],
-    default: [],
+    default: [appOperations.signIn],
   },
   callback: {
     type: String,
