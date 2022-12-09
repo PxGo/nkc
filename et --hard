@@ -1,0 +1,280 @@
+[33mcommit fd31d86eadfc98ce559320f7f9dc044a01162daf[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Merge: 2e5efb0d0 6bcbf0260
+Author: zz-si <1371188037@qq.com>
+Date:   Mon Dec 5 11:24:08 2022 +0800
+
+    Merge branch 'master' of github.com:pengxiguaa/nkc
+
+[33mcommit 6bcbf02600b2fe56708ea35078b1262048b1d197[m[33m ([m[1;31mpeng-shh/master[m[33m)[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Mon Dec 5 11:12:20 2022 +0800
+
+    pref: 优化账户密码验证
+
+[33mcommit e0b27099ef9d96821b1b2ed41573a79f66554901[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Dec 2 19:09:36 2022 +0800
+
+    pref: oauth
+
+[33mcommit d1d9fb2da6cf949b121b4b50a17113aee59f5a5a[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Dec 2 17:41:26 2022 +0800
+
+    pref: oauth
+
+[33mcommit 2e5efb0d0b2eaaadb2ed6f9354aeef11442c88e1[m
+Merge: ba1d655b8 530c986b5
+Author: zz-si <1371188037@qq.com>
+Date:   Fri Dec 2 14:52:05 2022 +0800
+
+    Merge branch 'master' of github.com:pengxiguaa/nkc
+
+[33mcommit 530c986b5c8d8f8de6161b16c08ac43ba35b3820[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Dec 2 14:47:39 2022 +0800
+
+    pref: oauth
+
+[33mcommit ba1d655b8fa009fb0b7c6ce6368527d3b06fb04a[m
+Author: zz-si <1371188037@qq.com>
+Date:   Wed Nov 30 19:06:10 2022 +0800
+
+    feat: nkc登录配置
+
+[33mcommit 446db56a67e925c9348aab2d06674190b3d8a694[m
+Merge: 946822dac 8fcba2e40
+Author: zz-si <1371188037@qq.com>
+Date:   Wed Nov 30 18:10:12 2022 +0800
+
+    Merge branch 'master' of https://github.com/pengxiguaa/nkc
+
+[33mcommit 8fcba2e40b373f1d8c78469ee1be13849d12c740[m
+Merge: 3d102e802 af294124a
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Wed Nov 30 18:05:40 2022 +0800
+
+    Merge branch 'master' of https://github.com/pengxiguaa/nkc
+
+[33mcommit 3d102e8020b705b5fa26674fc0376b14c5129811[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Wed Nov 30 18:04:49 2022 +0800
+
+    pref: oauth
+
+[33mcommit af294124a15575a438ac486e9c1ba46cd5d1f916[m
+Author: pengxiguaa <pengxiguaa@gmail.com>
+Date:   Mon Nov 28 22:34:28 2022 +0800
+
+    fix: 个人中心送审显示异常
+
+[33mcommit 61f1659f9f7711703d3c3a374bc996457d44095b[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 18 12:12:23 2022 +0800
+
+    fix: 社区编辑器历史页报错
+
+[33mcommit 946822dac13c0f46b3cce0cea021160626dbfe52[m
+Author: zz-si <1371188037@qq.com>
+Date:   Fri Nov 18 12:01:45 2022 +0800
+
+    fix: 处理社区内容历史记录ip报错
+
+[33mcommit 979bfe482de0551234b5b36bd87cc9a2f66eeb52[m
+Merge: 334dbf3c1 17098d556
+Author: zz-si <1371188037@qq.com>
+Date:   Fri Nov 18 11:03:51 2022 +0800
+
+    Merge branch 'master' of github.com:pengxiguaa/nkc
+
+[33mcommit 4e4e2a55d6b982280539fe8faa8fdc3d1fd2fd81[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 18 10:46:38 2022 +0800
+
+    pref: 优化短消息面板，支持触屏可拖动
+
+[33mcommit 2d5e7fd2fc96113aa577dd375c52942a92f5f6be[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 18 10:24:32 2022 +0800
+
+    pref: 优化商城订单页链接入口
+
+[33mcommit 17098d55653e042ed7f642bbf8e9ceb5e625f912[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Thu Nov 10 15:07:53 2022 +0800
+
+    fix: 修复短消息条数显示不准确的问题;
+
+[33mcommit f60214b29789eb07678d83cb9c324373fcb5d4d9[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Mon Nov 7 14:41:01 2022 +0800
+
+    fix: 通过审核时未同步长电文的ip到动态
+
+[33mcommit 9780cd770fe9bb059a8417acf553b9507f90c473[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Mon Nov 7 14:27:53 2022 +0800
+
+    pref: 调整社区回复评论字数限制
+
+[33mcommit ccc2c5cee30686c299d8fc1ce9dd7949c243b8c1[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Mon Nov 7 13:16:12 2022 +0800
+
+    pref: 后台管理IP查询优化
+
+[33mcommit fd32830a1416942b9789af8cc8b76c9adc55682f[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 4 17:35:01 2022 +0800
+
+    feat: 系统状态显示
+
+[33mcommit cd0cade64b0019105ad2f0c720795857fcb9e8d1[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 4 15:03:19 2022 +0800
+
+    pref: 优化电文管理
+
+[33mcommit a7e2be39bf4d988eaf5afb9b55ca74b7a91d260b[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 4 13:27:53 2022 +0800
+
+    fix: 社区编辑器默认未选中特殊领域默认分类
+
+[33mcommit 045df669fee258df58023b9b5b77148ea015388d[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 4 12:55:46 2022 +0800
+
+    fix: 独立文章动态未同步IP
+
+[33mcommit 98d62b8ae665d3865c1c1d45c74c51dcd052a7c6[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Nov 4 12:42:52 2022 +0800
+
+    pref: 创作中心媒体管理可删除处理失败的资源
+
+[33mcommit 206041465fe8ee30fbed95b1c16a312fd54c33b0[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Wed Nov 2 15:12:09 2022 +0800
+
+    fix: 专栏显示社区文章时分页错误
+
+[33mcommit 7cca84664d5d01ee253fc3b5326a4132bbfa659b[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Wed Nov 2 11:08:29 2022 +0800
+
+    fix: 搜索页分页异常
+
+[33mcommit c33534abce6250a4dd85d6e0031519303b1abd14[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Tue Nov 1 14:08:54 2022 +0800
+
+    feat: 专栏显示置顶回复
+
+[33mcommit e3fc8957d7741fdd42d1509994b70ee56494d098[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Tue Nov 1 11:40:25 2022 +0800
+
+    feat: 空间、专栏添加at功能
+
+[33mcommit 50566fcc01d0ee5dbf9b820ef19890f17ad5a50a[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Thu Oct 27 15:40:16 2022 +0800
+
+    fix: 用户归属地异常
+
+[33mcommit b39087f6ed986cd846df2f4e14f78641aee366d1[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Thu Oct 27 15:35:25 2022 +0800
+
+    fix: 长电文页报错
+
+[33mcommit 7053205dd318e0947809a6b615949a9d063dd50a[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Thu Oct 27 14:27:32 2022 +0800
+
+    fix: ip归属地异常
+
+[33mcommit 8f76faedad37b013e68fbac75d9276779301aa96[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Thu Oct 27 14:27:11 2022 +0800
+
+    fix: 专栏独立页报错
+
+[33mcommit 9e05a31ea4cd179a1dec5117a30907f929de6d39[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Tue Oct 25 16:27:33 2022 +0800
+
+    pref: 搜索页添加清除用户资料功能
+
+[33mcommit 8301610e4c0ab0351f812a0ec875ba763106fd48[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Tue Oct 25 16:27:24 2022 +0800
+
+    pref: 搜索页添加清除用户资料功能
+
+[33mcommit 36efc7ba7d315793f831d85464bf16639534fdf5[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Mon Oct 24 18:24:36 2022 +0800
+
+    pref: 搜索页添加用户屏蔽按钮；添加用户名敏感词检测；
+
+[33mcommit 1bfbd306137770546abcae1de5c878c156530ca9[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Oct 21 17:57:20 2022 +0800
+
+    pref: 主体信息调整
+
+[33mcommit f264feb5cafaee6b7d3365123e21a3ac8cb8c8ae[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Oct 21 17:29:10 2022 +0800
+
+    fix: 社区编辑器报错
+
+[33mcommit f6392d610891dea6ecec0641bf9a425fd44880ee[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Oct 21 17:09:06 2022 +0800
+
+    fix: 长电文页报错
+
+[33mcommit 00eef70e0cd31f98903958a7df754cb56ce5f7c2[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Oct 21 17:03:13 2022 +0800
+
+    pref: 电文评论ip归属地显示
+
+[33mcommit 6f0002ea59e477e4df9c4446f21cad83f427d981[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Fri Oct 21 16:57:13 2022 +0800
+
+    pref: 显示IP归属地、账号主体信息
+
+[33mcommit d0f8df0f747abd4e3c39dda936e1041f10d03644[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Thu Oct 20 18:02:20 2022 +0800
+
+    fix: 专栏状态判断异常
+
+[33mcommit 3360db6907e4dd03b5f0a42488321945ab3ab4ce[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Thu Oct 20 18:01:58 2022 +0800
+
+    pref: 优化第三方应用认证
+
+[33mcommit e411eb87e8dc380194f7b571eabda2a7d96780ff[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Wed Oct 19 14:45:57 2022 +0800
+
+    pref: 优化专栏主页文章链接
+
+[33mcommit c31e544b110ebfb3f548518ba924743025255288[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Wed Oct 19 14:22:51 2022 +0800
+
+    pref: 优化搜索权限
+
+[33mcommit 279a6f96e0a0d476a3fbec02d437f244f01c01cd[m
+Author: PXG <pengxiguaa@gmail.com>
+Date:   Tue Oct 18 18:39:39 2022 +0800
+
+    pref: 优化全局访问控制

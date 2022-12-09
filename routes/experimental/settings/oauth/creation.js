@@ -1,7 +1,8 @@
 const router = require('koa-router')();
+
 router
   .get('/', async (ctx, next) => {
-    ctx.remoteTemplate = 'oauth/creation/creation.pug';
+    // ctx.remoteTemplate = 'oauth/creation/creation.pug';
     await next();
   })
   .post('/', async (ctx, next) => {
@@ -9,7 +10,8 @@ router
     const name = body.fields.name.trim();
     const desc = body.fields.desc.trim();
     const home = body.fields.home.trim();
-    const callback = body.fields.callback.trim();
+    const ips = JSON.parse(body.fields.ips);
+    const operations = JSON.parse(body.fields.operations);
     const {icon} = body.files;
     const {checkString} = nkcModules.checkData;
     checkString(name, {
@@ -27,17 +29,13 @@ router
       minLength: 1,
       maxLength: 2000,
     });
-    checkString(callback, {
-      name: '回调链接',
-      minLength: 1,
-      maxLength: 2000,
-    });
     const app = await db.OAuthAppModel.createApp({
       uid: state.uid,
       name,
       desc,
       home,
-      callback,
+      operations,
+      ips
     });
     await db.AttachmentModel.saveOAuthAppIcon(app._id, icon);
     await next();
