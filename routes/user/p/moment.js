@@ -53,7 +53,9 @@ module.exports = async (ctx, next) => {
     };
     const count = await db.ArticleModel.countDocuments(match);
     paging = nkcModules.apiFunction.paging(page, count, 20);
-    let zoneArticles = await db.ArticleModel.find(match).sort({toc: -1});
+    // let zoneArticles = await db.ArticleModel.find(match).sort({toc: -1});
+    paging = nkcModules.apiFunction.paging(page, count, 20);
+    let zoneArticles = await db.ArticleModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     zoneArticles = await db.ArticleModel.getArticlesInfo(zoneArticles);
     data.momentsData = [];
     for(const article of zoneArticles) {
@@ -80,7 +82,7 @@ module.exports = async (ctx, next) => {
       permissions.reviewed = true;
     }
   }
-
+  
   data.paging = paging;
   data.permissions = permissions;
   await next();
